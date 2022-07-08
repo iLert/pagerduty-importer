@@ -3,9 +3,9 @@ const config = require('../config/default');
 
 const isAuthorized = async (req, res, next) => {
     var _isAuth = false;
-    if (req.headers && req.headers.Authorization) {
+    if (req.headers && req.headers.authorization) {
         
-        const token = req.headers.Authorization.split(' ')[1];
+        const token = req.headers.authorization.split(' ')[1];
         const isValid = await accessTokenInfo(token);
 
         if(isValid){
@@ -14,8 +14,8 @@ const isAuthorized = async (req, res, next) => {
         }
     }
     if(!_isAuth && req.headers && req.headers.RefreshToken){
-        const tokens = await refreshAccessToken(req.headers.Refresh-Token);
-        req.headers.Authorization = 'Bearer ' + tokens.access_token;
+        const tokens = await refreshAccessToken(req.headers.RefreshToken);
+        req.headers.authorization = 'Bearer ' + tokens.access_token;
         _isAuth = true;
         next();
     }
@@ -23,7 +23,7 @@ const isAuthorized = async (req, res, next) => {
         if(req.cookies.access_token){
             const isValid = await accessTokenInfo(req.cookies.access_token);
             if(isValid){
-                req.headers.Authorization = `Bearer ${req.cookies.access_token}`;
+                req.headers.authorization = `Bearer ${req.cookies.access_token}`;
                 _isAuth = true;
                 next();
             }
@@ -32,7 +32,7 @@ const isAuthorized = async (req, res, next) => {
             
             const tokens = await refreshAccessToken(req.cookies.refresh_token);
             
-            req.headers.Authorization = tokens.access_token;
+            req.headers.authorization = tokens.access_token;
             req.cookies.access_token = tokens.access_token;
             req.cookies.refresh_token = tokens.refresh_token;
             _isAuth = true;
