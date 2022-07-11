@@ -6,5 +6,6 @@ const userController = require('../controllers/userController');
 router.use(isAuthorized);
 
 router.get('/current', userController.getCurrentUser); // get current user 
+router.get('/migrateAllUsers', userController.migrateAllUsers); // migrate all users
 
 module.exports = router;

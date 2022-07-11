@@ -10,7 +10,7 @@ const getListOfAllUsers = async (token) => {
             'Authorization': 'Token token='+ token
           }
         });
-        return userResult.data;
+        return userResult;
         
     } catch (error) {
         return error
