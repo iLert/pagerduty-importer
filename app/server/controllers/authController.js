@@ -1,6 +1,6 @@
-const { debug } = require("console");
-const config = require('../config/default');
-var axios = require("axios").default;
+import { config } from "../config/default.js";
+
+import axios from "axios";
 
 const authorize = (req,res) => {
     const url = config.host + config.authorizeUrl;
@@ -48,14 +48,14 @@ const authorize_result = async (req,res) => {
         })
     }
 
-    res.cookie('access_token', result.data.access_token, {
+    res.cookie('ilert_access_token', result.data.access_token, {
         expires: new Date(Date.now() + 3600 * 1000)
     });
-    res.cookie('refresh_token', result.data.refresh_token, {
+    res.cookie('ilert_refresh_token', result.data.refresh_token, {
         expires: new Date(Date.now() + 3600 * 1000 * 10)
     });
 
     res.send(result.data);
 }
 
-module.exports = {authorize,authorize_result}
+export { authorize, authorize_result };

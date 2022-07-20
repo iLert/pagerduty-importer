@@ -1,11 +1,11 @@
-const express = require('express');
-const authRoutes = require('./routes/authRoutes');
-const migrationRoutes = require('./routes/migrationRoutes');
-const dataRoutes = require('./routes/dataRoutes');
-const app = express();
-const config = require('./config/default');
-const cookieParser = require('cookie-parser')
+import  express  from 'express';
+import {authRoutes} from './routes/authRoutes.js';
+import {migrationRoutes} from './routes/migrationRoutes.js';
+import {dataRoutes} from './routes/dataRoutes.js';
+import {config} from './config/default.js';
+import cookieParser from 'cookie-parser';
 
+const app = express();
 
 app.listen(config.port, () => console.log(`Server is running on port: http://localhost:${config.port}`));
 app.use(cookieParser());

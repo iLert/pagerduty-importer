@@ -1,5 +1,5 @@
-var axios = require("axios").default;
-const config = require('../config/default');
+import axios from "axios";
+import { config } from "../config/default.js";
 
 const isAuthorized = async (req, res, next) => {
     var _isAuth = false;
@@ -100,4 +100,4 @@ const accessTokenInfo = async (accessToken) => {
     }
 }
 
-module.exports = isAuthorized;
+export {isAuthorized};
