@@ -26,13 +26,9 @@ const isAuthorized = async (req, res, next) => {
         if(result.data.active == true){
             return next();
         }
-        console.log("Token is not active");
     }
     catch(error) {
-        console.log("Error while getting access token info =>" + error);
-        return res.status(500).send({
-            "message": error
-        })
+        console.log("ACCESS TOKEN ERROR => " + error?.response?.data?.message || error.message);
     }
     const refreshToken = req.headers?.refresh_token || req.cookies?.ilert_refresh_token;
 

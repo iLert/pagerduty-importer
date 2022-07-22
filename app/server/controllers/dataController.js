@@ -1,26 +1,23 @@
-import {PagerDuty} from './pagerDuty.js';
+import {PagerDuty} from "./pagerDuty.js";
 
 const getUsersFromPagerDuty = async (req,res) => {
     if(!req.headers.pagerdutykey){
-        res.status(400).send({
+        return res.status(400).send({
             "message": "No pagerduty key provided",
         })
     }
 
     const pagerDuty = new PagerDuty(req.headers.pagerdutykey);
-    const users = await pagerDuty.getDataFromPagerDuty('https://api.pagerduty.com/users');
+    const users = await pagerDuty.getUsersFromPagerDuty();
 
     if(users.error){
-        res.status(users.status).send({
-            "message": "Error while getting users from PagerDuty",
-            "error": users.error
+        return res.status(users.error.status).send({
+            "message": users.error.message,
         })
     }
-    else{
-        res.status(200).send({
-            "users": users.data.users
-        })
-    }
+    return res.status(200).send({
+        "users": users
+    })
 }
 const getTeamsFromPagerDuty = async (req,res) => {
     if(!req.headers.pagerdutykey){
@@ -30,19 +27,16 @@ const getTeamsFromPagerDuty = async (req,res) => {
     }
 
     const pagerDuty = new PagerDuty(req.headers.pagerdutykey);
-    const teams = await pagerDuty.getDataFromPagerDuty('https://api.pagerduty.com/teams');
+    const teams = await pagerDuty.getTeamsFromPagerDuty();
 
     if(teams.error){
-        res.status(teams.status).send({
-            "message": "Error while getting teams from PagerDuty",
-            "error": teams.error
+        return res.status(teams.error.status).send({
+            "message": teams.error.message,
         })
     }
-    else{
-        res.status(200).send({
-            "teams": teams.data.teams
-        })
-    }
+    return res.status(200).send({
+        "teams": teams
+    })
 }
 const getSchedulesFromPagerDuty = async (req,res) => {
     if(!req.headers.pagerdutykey){
@@ -52,19 +46,16 @@ const getSchedulesFromPagerDuty = async (req,res) => {
     }
 
     const pagerDuty = new PagerDuty(req.headers.pagerdutykey);
-    const schedules = await pagerDuty.getDataFromPagerDuty('https://api.pagerduty.com/schedules');
+    const schedules = await pagerDuty.getSchedulesFromPagerDuty();
 
     if(schedules.error){
-        res.status(schedules.status).send({
-            "message": "Error while getting schedules from PagerDuty",
-            "error": schedules.error
+        return res.status(schedules.error.status).send({
+            "message": schedules.error.message,
         })
     }
-    else{
-        res.status(200).send({
-            "schedules": schedules.data.schedules
-        })
-    }
+    return res.status(200).send({
+        "schedules": schedules
+    })
 }
 const getEscalationPoliciesFromPagerDuty = async (req,res) => {
     if(!req.headers.pagerdutykey){
@@ -74,19 +65,16 @@ const getEscalationPoliciesFromPagerDuty = async (req,res) => {
     }
 
     const pagerDuty = new PagerDuty(req.headers.pagerdutykey);
-    const escalation_policies = await pagerDuty.getDataFromPagerDuty('https://api.pagerduty.com/escalation_policies');
+    const escalation_policies = await pagerDuty.getEscalationPoliciesFromPagerDuty();
 
     if(escalation_policies.error){
-        res.status(escalation_policies.status).send({
-            "message": "Error while getting escalation_policies from PagerDuty",
-            "error": escalation_policies.error
+        return res.status(escalation_policies.error.status).send({
+            "message": escalation_policies.error.message,
         })
     }
-    else{
-        res.status(200).send({
-            "escalation_policies": escalation_policies.data.escalation_policies
-        })
-    }
+    return res.status(200).send({
+        "escalation_policies": escalation_policies
+    })
 }
 const getServicesFromPagerDuty = async (req,res) => {
     if(!req.headers.pagerdutykey){
@@ -96,19 +84,16 @@ const getServicesFromPagerDuty = async (req,res) => {
     }
 
     const pagerDuty = new PagerDuty(req.headers.pagerdutykey);
-    const services = await pagerDuty.getDataFromPagerDuty('https://api.pagerduty.com/services');
+    const services = await pagerDuty.getServicesFromPagerDuty();
 
     if(services.error){
-        res.status(services.status).send({
-            "message": "Error while getting services from PagerDuty",
-            "error": services.error
+        return res.status(services.error.status).send({
+            "message": services.error.message,
         })
     }
-    else{
-        res.status(200).send({
-            "services": services.data.services
-        })
-    }
+    return res.status(200).send({
+        "services": services
+    })
 }
 
 export {getUsersFromPagerDuty,getTeamsFromPagerDuty,getSchedulesFromPagerDuty,getEscalationPoliciesFromPagerDuty,getServicesFromPagerDuty};

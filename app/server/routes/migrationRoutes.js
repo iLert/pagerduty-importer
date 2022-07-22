@@ -1,10 +1,10 @@
-const express = require('express');
+import express from "express";
 const router = express.Router();
-const isAuthorized = require('../middleware/auth');
-const migrationController = require('../controllers/migrationController');
+import {isAuthorized} from "../middleware/auth.js";
+//const migrationController = require("../controllers/migrationController");
 
 router.use(isAuthorized);
 
-router.get('/UsersAndTeams', migrationController.migrateUsersAndTeams); // migrate users and teams
+//router.get("/UsersAndTeams", migrationController.migrateUsersAndTeams); // migrate users and teams
 
-module.exports = router;
+export {router as migrationRoutes};
