@@ -2,49 +2,69 @@ import axios from "axios";
 import { config } from "../config/default.js";
 
 const isAuthorized = async (req, res, next) => {
-    var _isAuth = false;
-    if (req.headers && req.headers.authorization) {
-        
-        const token = req.headers.authorization.split(' ')[1];
-        const isValid = await accessTokenInfo(token);
 
-        if(isValid){
-            _isAuth = true;
-            next();
-        }
-    }
-    if(!_isAuth && req.headers && req.headers.RefreshToken){
-        const tokens = await refreshAccessToken(req.headers.RefreshToken);
-        req.headers.authorization = 'Bearer ' + tokens.access_token;
-        _isAuth = true;
-        next();
-    }
-    if(!_isAuth && req.cookies && req.cookies.access_token || req.cookies.refresh_token){
-        if(req.cookies.access_token){
-            const isValid = await accessTokenInfo(req.cookies.access_token);
-            if(isValid){
-                req.headers.authorization = `Bearer ${req.cookies.access_token}`;
-                _isAuth = true;
-                next();
-            }
-        }
-        if(!_isAuth && req.cookies.refresh_token){
-            
-            const tokens = await refreshAccessToken(req.cookies.refresh_token);
-            
-            req.headers.authorization = tokens.access_token;
-            req.cookies.access_token = tokens.access_token;
-            req.cookies.refresh_token = tokens.refresh_token;
-            _isAuth = true;
-            next();
-        }
-    }
-    if(!_isAuth){
+    const accessToken = req.headers?.authorization?.split(" ")[1] || req.cookies?.ilert_access_token;
+
+    if(!accessToken){
         return res.status(401).send({
-            message: 'Unauthorized'
+            message: "Unauthorized"
         })
     }
+
+    const url  = "https://api.ilert.com/api/developers/oauth2/token_info";
+    const params = new URLSearchParams()
+    params.append("token", accessToken);
+
+    try {
+        let result = await axios.post(url, params, {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json"
+        }
+        });
+
+        if(result.data.active == true){
+            return next();
+        }
+        console.log("Token is not active");
+    }
+    catch(error) {
+        console.log("Error while getting access token info =>" + error);
+        return res.status(500).send({
+            "message": error
+        })
+    }
+    const refreshToken = req.headers?.refresh_token || req.cookies?.ilert_refresh_token;
+
+    if(!refreshToken){
+        return res.status(401).send({
+            message: "Unauthorized"
+        })
+    }
+
+    const newTokens = await refreshAccessToken(refreshToken);
+
+    if(newTokens.error){
+        return res.status(500).send({
+            "message": newTokens.error
+        })
+    }
+
+    req.headers.ilert_tokens = {
+        accessToken: newTokens.access_token,
+        refreshToken: newTokens.refresh_token
+    }
+
+    res.cookie("ilert_access_token", newTokens.access_token, {
+        expires: new Date(Date.now() + 3600 * 1000 * 24) // 1 day
+    });
+    res.cookie("ilert_refresh_token", newTokens.refresh_token, {
+        expires: new Date(Date.now() + 3600 * 1000 * 24 * 365) // 1 year
+    });
+
+    return next();
 }
+
 const refreshAccessToken = async (refreshToken) => {
 
     const url  = config.host + config.tokenUrl;
@@ -52,10 +72,9 @@ const refreshAccessToken = async (refreshToken) => {
       params.append("client_id", config.clientId);
       params.append("client_secret", config.clientSecret);
       params.append("refresh_token", refreshToken);
-      params.append("grant_type", 'refresh_token');
-    let result = null;
+      params.append("grant_type", "refresh_token");
     try {
-        result = await axios.post(url, params, {
+        let result = await axios.post(url, params, {
         headers: {
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json"
@@ -68,35 +87,10 @@ const refreshAccessToken = async (refreshToken) => {
         }
     }
     catch(error) {
-        return res.send({
-            message: error.message
-        })
-    }
-}
-
-const accessTokenInfo = async (accessToken) => {
-    const url  = 'https://api.ilert.com/api/developers/oauth2/token_info';
-    const params = new URLSearchParams()
-    params.append("token", accessToken);
-
-    let result = null;
-    try {
-        result = await axios.post(url, params, {
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "Accept": "application/json"
+        console.log("Error while refreshing access token =>" + error);
+        return {
+            error: "Error while refreshing access token"
         }
-        });
-
-        if(result.data.active == true){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-    catch(error) {
-        return false;
     }
 }
 

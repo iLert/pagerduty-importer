@@ -6,9 +6,9 @@ const authorize = (req,res) => {
     const url = config.host + config.authorizeUrl;
     const queryParams = new URLSearchParams({
         client_id: config.clientId,
-        response_type: 'code',
+        response_type: "code",
         redirect_uri: config.redirectUri,
-        scope: 'profile source:w',
+        scope: "profile source:w",
         state: config.state
     });
     
@@ -23,7 +23,7 @@ const authorize_result = async (req,res) => {
 
     const code = req.query.code;
     if(!code) {
-        return res.end("Failed to retrieve 'code', please try again");
+        return res.end("Failed to retrieve " +code +", please try again");
     }
     
     const url  = config.host + config.tokenUrl;
@@ -48,11 +48,11 @@ const authorize_result = async (req,res) => {
         })
     }
 
-    res.cookie('ilert_access_token', result.data.access_token, {
-        expires: new Date(Date.now() + 3600 * 1000)
+    res.cookie("ilert_access_token", result.data.access_token, {
+        expires: new Date(Date.now() + 3600 * 1000 * 24) // 1 day
     });
-    res.cookie('ilert_refresh_token', result.data.refresh_token, {
-        expires: new Date(Date.now() + 3600 * 1000 * 10)
+    res.cookie("ilert_refresh_token", result.data.refresh_token, {
+        expires: new Date(Date.now() + 3600 * 1000 * 24 * 365)  // 1 year
     });
 
     res.send(result.data);
